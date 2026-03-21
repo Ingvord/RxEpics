@@ -31,11 +31,10 @@ vocabulary as RxJTango.
 - Custom sources via `rx.create(subscribe_fn)`
 - asyncio integration via `AsyncIOScheduler`
 
-### Package manager: uv
+### Dependencies
 
 ```
-uv init rxepics
-uv add caproto[asyncio] reactivex
+pip install -r requirements.txt
 ```
 
 ---

@@ -12,8 +12,7 @@ fluent pipelines — work on EPICS PVs with the same operator vocabulary as RxJT
 ## Setup
 
 ```bash
-uv init rxepics
-uv add caproto[asyncio] reactivex
+pip install -r requirements.txt
 ```
 
 ## Project layout

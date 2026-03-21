@@ -7,10 +7,10 @@ the test IOC.
 
 ## 0. Setup
 
-### Install the package
+### Install dependencies
 
 ```shell
-uv sync
+pip install -r requirements.txt
 ```
 
 ### Start the test IOC
@@ -22,7 +22,7 @@ docker compose up -d
 Wait ~5 s for the softIoc to initialise, then verify PVs are accessible:
 
 ```shell
-uv run python -c "
+python -c "
 import asyncio
 from caproto.asyncio.client import Context
 async def check():
@@ -39,10 +39,10 @@ asyncio.run(check())
 All examples below can be run as:
 
 ```shell
-uv run python examples/<script>.py [args]
+python examples/<script>.py [args]
 ```
 
-Or with `PYTHONPATH` if you prefer plain Python:
+Or set `PYTHONPATH` if not running from the repo root:
 
 ```shell
 PYTHONPATH=src python examples/<script>.py [args]
@@ -57,7 +57,7 @@ PYTHONPATH=src python examples/<script>.py [args]
 `read_pv()` is a single-shot Observable: subscribe once, get one value, done.
 
 ```shell
-uv run python examples/read_pv.py TEST:DOUBLE TEST:LONG
+python examples/read_pv.py TEST:DOUBLE TEST:LONG
 ```
 
 Key code:
@@ -80,7 +80,7 @@ read_pv("TEST:DOUBLE", ctx).subscribe(
 The stream runs until Ctrl+C.
 
 ```shell
-uv run python examples/poll_pv.py TEST:CALC 500
+python examples/poll_pv.py TEST:CALC 500
 ```
 
 Key code:
@@ -102,7 +102,7 @@ rx.interval(timedelta(milliseconds=500), scheduler=scheduler).pipe(
 the IOC sends updates when the value changes rather than being asked every tick.
 
 ```shell
-uv run python examples/monitor_pv.py TEST:CALC
+python examples/monitor_pv.py TEST:CALC
 ```
 
 Key code:
@@ -124,13 +124,13 @@ monitor_pv("TEST:CALC", ctx).subscribe(on_next=print)
 One-shot:
 
 ```shell
-uv run python examples/multi_pv_snapshot.py TEST:DOUBLE TEST:LONG TEST:STRING
+python examples/multi_pv_snapshot.py TEST:DOUBLE TEST:LONG TEST:STRING
 ```
 
 Continuous (repeat every 2 s):
 
 ```shell
-uv run python examples/multi_pv_snapshot.py 2000 TEST:DOUBLE TEST:LONG TEST:STRING
+python examples/multi_pv_snapshot.py 2000 TEST:DOUBLE TEST:LONG TEST:STRING
 ```
 
 Key code:
@@ -154,7 +154,7 @@ rx.from_iterable(pv_names).pipe(
 only when BOTH complete — the pair is never half-delivered.
 
 ```shell
-uv run python examples/zip_pvs.py TEST:DOUBLE TEST:LONG 500
+python examples/zip_pvs.py TEST:DOUBLE TEST:LONG 500
 ```
 
 Key code:
@@ -177,7 +177,7 @@ rx.interval(timedelta(milliseconds=500), scheduler=scheduler).pipe(
 `to_list()` accumulates all N values automatically.
 
 ```shell
-uv run python examples/pv_stats.py TEST:CALC 20 500
+python examples/pv_stats.py TEST:CALC 20 500
 ```
 
 Arguments: `<pv_name> [samples=20] [interval-ms=500]`
@@ -189,7 +189,7 @@ Arguments: `<pv_name> [samples=20] [interval-ms=500]`
 **Two PVs read simultaneously — guaranteed same-tick coherent pair.**
 
 ```shell
-uv run python examples/pv_correlate.py TEST:DOUBLE TEST:LONG 500
+python examples/pv_correlate.py TEST:DOUBLE TEST:LONG 500
 ```
 
 ---
@@ -204,7 +204,7 @@ A failure on one PV is caught by `catch` — it logs and completes that
 sub-stream without affecting the others.
 
 ```shell
-uv run python examples/alarm_monitor.py 200 500 TEST:CALC TEST:DOUBLE
+python examples/alarm_monitor.py 200 500 TEST:CALC TEST:DOUBLE
 ```
 
 Arguments: `<threshold> <interval-ms> <pv_name> [<pv_name2> ...]`
@@ -232,7 +232,7 @@ rx.merge(*streams).subscribe(on_next=print)
 `interval → flat_map(read) → map(calibrate) → flat_map(write)`
 
 ```shell
-uv run python examples/calibration_pipeline.py TEST:CALC TEST:DOUBLE 2.0 10.0 1000
+python examples/calibration_pipeline.py TEST:CALC TEST:DOUBLE 2.0 10.0 1000
 ```
 
 Arguments: `<src_pv> <dst_pv> <gain> <offset> [interval-ms=1000]`
@@ -244,7 +244,7 @@ Arguments: `<src_pv> <dst_pv> <gain> <offset> [interval-ms=1000]`
 **Six steps. Six PV interactions. Zero callbacks. Zero intermediate variables.**
 
 ```shell
-uv run python examples/pv_pipeline.py
+python examples/pv_pipeline.py
 ```
 
 Expected output:
@@ -266,7 +266,7 @@ Expected output:
 **The IOC updates faster than you need. `sample` bridges the gap — one operator, no sleep, no counter.**
 
 ```shell
-uv run python examples/pv_throttle.py TEST:CALC 50 1000
+python examples/pv_throttle.py TEST:CALC 50 1000
 ```
 
 Arguments: `<pv_name> [poll-ms=50] [display-ms=1000]`
@@ -292,7 +292,7 @@ rx.interval(timedelta(milliseconds=poll_ms), scheduler=scheduler).pipe(
 by 1 each tick. High-frequency noise averages out; slow trends remain visible.
 
 ```shell
-uv run python examples/pv_sliding_average.py TEST:CALC 5 400
+python examples/pv_sliding_average.py TEST:CALC 5 400
 ```
 
 Arguments: `<pv_name> [window=5] [interval-ms=400]` — output starts after the first full window.
@@ -321,7 +321,7 @@ Compare with `pv_stats.py`: that script collects N samples into a list and exits
 This one runs indefinitely and never allocates a growing list.
 
 ```shell
-uv run python examples/pv_running_stats.py TEST:CALC 500
+python examples/pv_running_stats.py TEST:CALC 500
 ```
 
 Arguments: `<pv_name> [interval-ms=500]`
@@ -352,7 +352,7 @@ Three strategies:
 | `buffer` | Queue up to N items, then crash — demonstrates the failure mode |
 
 ```shell
-uv run python examples/pv_backpressure.py TEST:CALC
-uv run python examples/pv_backpressure.py TEST:CALC 100 600 --strategy drop
-uv run python examples/pv_backpressure.py TEST:CALC 100 600 --strategy buffer --buffer-size 5
+python examples/pv_backpressure.py TEST:CALC
+python examples/pv_backpressure.py TEST:CALC 100 600 --strategy drop
+python examples/pv_backpressure.py TEST:CALC 100 600 --strategy buffer --buffer-size 5
 ```
