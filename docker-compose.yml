@@ -1,6 +1,8 @@
 services:
   epics-ioc:
-    image: prjemian/synapps:R6-3
+    build:
+      context: .
+      dockerfile: Dockerfile.ioc
     environment:
       - EPICS_CA_ADDR_LIST=localhost
       - EPICS_CA_AUTO_ADDR_LIST=YES
