@@ -1,8 +1,6 @@
 services:
   epics-ioc:
-    build:
-      context: .
-      dockerfile: Dockerfile.ioc
+    image: ghcr.io/epics-containers/epics-base-developer:7.0.10ec1
     environment:
       - EPICS_CA_ADDR_LIST=localhost
       - EPICS_CA_AUTO_ADDR_LIST=YES
@@ -13,4 +11,4 @@ services:
       - "5065:5065/udp"
     volumes:
       - ./test.db:/test.db:ro
-    command: softIoc -d /test.db
+    command: /epics/epics-base/bin/linux-x86_64/softIoc -d /test.db
