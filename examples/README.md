@@ -36,16 +36,17 @@ asyncio.run(check())
 
 ### Running examples
 
-All examples below can be run as:
+Set these two env vars so caproto finds the local IOC (add to your shell profile to avoid repeating):
 
 ```shell
-python examples/<script>.py [args]
+export EPICS_CA_ADDR_LIST=localhost
+export EPICS_CA_AUTO_ADDR_LIST=NO
 ```
 
-Or set `PYTHONPATH` if not running from the repo root:
+Then run any example from the repo root:
 
 ```shell
-PYTHONPATH=src python examples/<script>.py [args]
+PYTHONPATH=src python3 examples/<script>.py [args]
 ```
 
 ---

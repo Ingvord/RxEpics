@@ -12,7 +12,7 @@ def write_pv(pv_name: str, value, ctx: Context) -> rx.Observable:
     def subscribe(observer, scheduler=None):
         async def _write():
             try:
-                (pv,) = ctx.get_pvs(pv_name)
+                (pv,) = await ctx.get_pvs(pv_name)
                 await pv.write([value])
                 observer.on_next(value)
                 observer.on_completed()

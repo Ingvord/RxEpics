@@ -25,7 +25,7 @@ def monitor_pv(pv_name: str, ctx: Context) -> rx.Observable:
         async def _start():
             nonlocal ca_sub
             try:
-                (pv,) = ctx.get_pvs(pv_name)
+                (pv,) = await ctx.get_pvs(pv_name)
                 ca_sub = pv.subscribe()
                 ca_sub.add_callback(callback)
             except Exception as exc:

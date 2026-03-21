@@ -12,7 +12,7 @@ def read_pv(pv_name: str, ctx: Context) -> rx.Observable:
     def subscribe(observer, scheduler=None):
         async def _read():
             try:
-                (pv,) = ctx.get_pvs(pv_name)
+                (pv,) = await ctx.get_pvs(pv_name)
                 reading = await pv.read()
                 observer.on_next(float(reading.data[0]))
                 observer.on_completed()
