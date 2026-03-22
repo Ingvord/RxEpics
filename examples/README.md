@@ -7,6 +7,8 @@ the test IOC.
 
 ## 0. Setup
 
+From project root
+
 ### Install dependencies
 
 ```shell
@@ -58,7 +60,7 @@ PYTHONPATH=src python3 examples/<script>.py [args]
 `read_pv()` is a single-shot Observable: subscribe once, get one value, done.
 
 ```shell
-python examples/read_pv.py TEST:DOUBLE TEST:LONG
+python read_pv.py TEST:DOUBLE TEST:LONG
 ```
 
 Key code:
@@ -81,7 +83,7 @@ read_pv("TEST:DOUBLE", ctx).subscribe(
 The stream runs until Ctrl+C.
 
 ```shell
-python examples/poll_pv.py TEST:CALC 500
+python poll_pv.py TEST:CALC 500
 ```
 
 Key code:
@@ -103,7 +105,7 @@ rx.interval(timedelta(milliseconds=500), scheduler=scheduler).pipe(
 the IOC sends updates when the value changes rather than being asked every tick.
 
 ```shell
-python examples/monitor_pv.py TEST:CALC
+python monitor_pv.py TEST:CALC
 ```
 
 Key code:
@@ -125,13 +127,13 @@ monitor_pv("TEST:CALC", ctx).subscribe(on_next=print)
 One-shot:
 
 ```shell
-python examples/multi_pv_snapshot.py TEST:DOUBLE TEST:LONG TEST:STRING
+python multi_pv_snapshot.py TEST:DOUBLE TEST:LONG TEST:STRING
 ```
 
 Continuous (repeat every 2 s):
 
 ```shell
-python examples/multi_pv_snapshot.py 2000 TEST:DOUBLE TEST:LONG TEST:STRING
+python multi_pv_snapshot.py 2000 TEST:DOUBLE TEST:LONG TEST:STRING
 ```
 
 Key code:
@@ -155,7 +157,7 @@ rx.from_iterable(pv_names).pipe(
 only when BOTH complete — the pair is never half-delivered.
 
 ```shell
-python examples/zip_pvs.py TEST:DOUBLE TEST:LONG 500
+python zip_pvs.py TEST:DOUBLE TEST:LONG 500
 ```
 
 Key code:
@@ -178,7 +180,7 @@ rx.interval(timedelta(milliseconds=500), scheduler=scheduler).pipe(
 `to_list()` accumulates all N values automatically.
 
 ```shell
-python examples/pv_stats.py TEST:CALC 20 500
+python pv_stats.py TEST:CALC 20 500
 ```
 
 Arguments: `<pv_name> [samples=20] [interval-ms=500]`
@@ -190,7 +192,7 @@ Arguments: `<pv_name> [samples=20] [interval-ms=500]`
 **Two PVs read simultaneously — guaranteed same-tick coherent pair.**
 
 ```shell
-python examples/pv_correlate.py TEST:DOUBLE TEST:LONG 500
+python pv_correlate.py TEST:DOUBLE TEST:LONG 500
 ```
 
 ---
@@ -205,7 +207,7 @@ A failure on one PV is caught by `catch` — it logs and completes that
 sub-stream without affecting the others.
 
 ```shell
-python examples/alarm_monitor.py 200 500 TEST:CALC TEST:DOUBLE
+python alarm_monitor.py 200 500 TEST:CALC TEST:DOUBLE
 ```
 
 Arguments: `<threshold> <interval-ms> <pv_name> [<pv_name2> ...]`
@@ -233,7 +235,7 @@ rx.merge(*streams).subscribe(on_next=print)
 `interval → flat_map(read) → map(calibrate) → flat_map(write)`
 
 ```shell
-python examples/calibration_pipeline.py TEST:CALC TEST:DOUBLE 2.0 10.0 1000
+python calibration_pipeline.py TEST:CALC TEST:DOUBLE 2.0 10.0 1000
 ```
 
 Arguments: `<src_pv> <dst_pv> <gain> <offset> [interval-ms=1000]`
@@ -245,7 +247,7 @@ Arguments: `<src_pv> <dst_pv> <gain> <offset> [interval-ms=1000]`
 **Six steps. Six PV interactions. Zero callbacks. Zero intermediate variables.**
 
 ```shell
-python examples/pv_pipeline.py
+python pv_pipeline.py
 ```
 
 Expected output:
@@ -267,7 +269,7 @@ Expected output:
 **The IOC updates faster than you need. `sample` bridges the gap — one operator, no sleep, no counter.**
 
 ```shell
-python examples/pv_throttle.py TEST:CALC 50 1000
+python pv_throttle.py TEST:CALC 50 1000
 ```
 
 Arguments: `<pv_name> [poll-ms=50] [display-ms=1000]`
@@ -293,7 +295,7 @@ rx.interval(timedelta(milliseconds=poll_ms), scheduler=scheduler).pipe(
 by 1 each tick. High-frequency noise averages out; slow trends remain visible.
 
 ```shell
-python examples/pv_sliding_average.py TEST:CALC 5 400
+python pv_sliding_average.py TEST:CALC 5 400
 ```
 
 Arguments: `<pv_name> [window=5] [interval-ms=400]` — output starts after the first full window.
@@ -322,7 +324,7 @@ Compare with `pv_stats.py`: that script collects N samples into a list and exits
 This one runs indefinitely and never allocates a growing list.
 
 ```shell
-python examples/pv_running_stats.py TEST:CALC 500
+python pv_running_stats.py TEST:CALC 500
 ```
 
 Arguments: `<pv_name> [interval-ms=500]`
@@ -353,7 +355,7 @@ Three strategies:
 | `buffer` | Queue up to N items, then crash — demonstrates the failure mode |
 
 ```shell
-python examples/pv_backpressure.py TEST:CALC
-python examples/pv_backpressure.py TEST:CALC 100 600 --strategy drop
-python examples/pv_backpressure.py TEST:CALC 100 600 --strategy buffer --buffer-size 5
+python pv_backpressure.py TEST:CALC
+python pv_backpressure.py TEST:CALC 100 600 --strategy drop
+python pv_backpressure.py TEST:CALC 100 600 --strategy buffer --buffer-size 5
 ```
